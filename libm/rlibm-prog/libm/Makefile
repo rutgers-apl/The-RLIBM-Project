@@ -9,7 +9,7 @@ floatrnolibm: floatrnolibm.a
 CC = gcc
 
 floatfiles = exp2 log2 exp log10 log cosh cosh_v2 cosh_v3 cosh_v4 sinh sinpi cospi exp10 exp10_v2
-floatrnofiles = log2 log exp10 exp2 exp log10 cosh sinh cospi sinpi log-piecewise log2-piecewise exp-piecewise exp2-piecewise exp10-piecewise log10-piecewise log10-piecewise_v2
+floatrnofiles = log2 log exp10 exp2 exp log10 cosh sinh cospi sinpi log-piecewise log2-piecewise exp-piecewise exp2-piecewise exp10-piecewise log10-piecewise log10-piecewise_v2 rlibm-all
 
 
 floatsrcdir = float

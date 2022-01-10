@@ -23,6 +23,23 @@ double rlibm_rno_sinh(float);
 double rlibm_rno_cospi(float);
 double rlibm_rno_sinpi(float);
 
+/* public interface for functions that produces correctly rounded
+   results for any rounding mode by setting the appropriate rounding
+   mode in the environment.  Set fesetround with FE_TONEAREST,
+   FE_UPWARD, FE_DOWNWARD, or FE_TOWARDZERO before the library call to
+   get correctly rounded results for that mode */
+
+float rlibm_all_fast_log2(float);
+float rlibm_all_fast_log10(float);
+float rlibm_all_fast_log(float);
+float rlibm_all_fast_exp2(float);
+float rlibm_all_fast_exp10(float);
+float rlibm_all_fast_exp(float);
+float rlibm_all_fast_sinpi(float);
+float rlibm_all_fast_cospi(float);
+float rlibm_all_fast_sinh(float);
+float rlibm_all_fast_cosh(float);
+
 #if 0
 float rlibm_rno_exp2(float);
 
