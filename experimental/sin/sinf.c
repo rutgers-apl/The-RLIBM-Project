@@ -96,18 +96,18 @@ float rlibm_fast_sin(float x) {
   double R2 = R * R;
   double cospiR, sinpiR;
 
-  sinpiR = 2.55012544524189177508333159494213759899139404296875;
+  sinpiR = 0x1.466a82b601746p+1;
   sinpiR *= R2;
-  sinpiR += -5.16771278009540946385413917596451938152313232421875;
+  sinpiR += -0x1.4abbce626862bp+2;
   sinpiR *= R2;
-  sinpiR += 3.141592653589793560087173318606801331043243408203125;
+  sinpiR += 0x1.921fb54442d19p+1;
   sinpiR *= R;
 
-  cospiR = 4.058632944512741147491396986879408359527587890625;
+  cospiR = 0x1.03c0a464c9a04p+2;
   cospiR *= R2;
-  cospiR += -4.9348022003602576290859360597096383571624755859375;
+  cospiR += -0x1.3bd3cc9bb1ac6p+2; 
   cospiR *= R2;
-  cospiR += 1.0;
+  cospiR += 0x1p+0;
   
   double y = sinpiMBy512[N2] * cospiR + cospiMBy512[N2] * sinpiR;
   fX.f = y;
