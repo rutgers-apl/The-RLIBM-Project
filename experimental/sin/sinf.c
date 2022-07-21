@@ -1,7 +1,9 @@
 
 /* MIT License */
 
-/* Copyright (c) 2022 Sehyeok Park and Santosh Nagarakatte, Rutgers Architecture and Programming Languages (RAPL) Group */
+/* Copyright (c) 2022 Sehyeok Park and Santosh Nagarakatte, The RLIBM
+   project, Rutgers Architecture and Programming Languages (RAPL)
+   Group */
 
 /* Permission is hereby granted, free of charge, to any person obtaining a copy */
 /* of this software and associated documentation files (the "Software"), to deal */
@@ -39,18 +41,43 @@ float rlibm_fast_sin(float x) {
   if (fX.i >= 0x7F800000) {
     return 0.0f/0.0f;
   }
+
+  /* for small values of x up to  0x1.d12ed2p-12, sin(x) = x */
   if (fX.i < 0x39E89769) {
     return fX.f*s;
   }
+
+  /* one special case input: +/- 0x1.487e0cp+103  */
   if (fX.i == 0x73243F06) {
     fX.i = 0x3E943A84;
     return fX.f*s;
   }
+
+  /* Range reduction happens at two levels:
+     First level:
+     express input x = k*pi + r, k is the nearest integer.
+     sin(x) = sin(k*pi + r) = sin(k*pi)cos(r) + cos(k*pi)sin(r). 
+     sin(x) = (-1)^k. sin(r).
+
+     To compute sin(r), we use sinpi(y), where y is x/pi -k.
+     r = x - k*pi = pi( x/pi - k).
+     sin(r) = sinpi(y).
+     Here |y| < 0.5
+
+     Second level:  
+     For sinpi(y), we use the range reduction in Section 2 of our PLDI 2021 paper:
+     https://people.cs.rutgers.edu/~sn349/papers/rlibm32-pldi-2021-preprint.pdf
+
+     sinpi(x) = (-1)^K1 (sinpi(N/512) cospi(R) + cospi(N/512) sinpi(R))
+     Here K1 and R are computed as described in our above paper.
+  */
   double R;
   /* Get r */
   if (fX.i <= 0x4C800000) {
+    /* small range reduction */
     double prod = fX.f * one_over_pi_28[0];
-    double kd = round(prod); 
+    double kd = round(prod);
+    /* max value of kd is less than the range of an int */
     int n = ((int64_t)kd) & 0x1;
 
     R = prod - kd;
@@ -63,13 +90,20 @@ float rlibm_fast_sin(float x) {
     R = fabs(R);
     if (n & 0x1) s *= -1;
   } else {
+    
     int x_biased_e = (fX.i & 0x7F800000) >> 23L;
     int x_lsb_e = x_biased_e - 150;
     int idx = 0;
+
+    /* we are only interested in the last bit of k, ignore all other
+       bits */
+  
     while (x_lsb_e + one_over_pi_28_exp[idx] > 0) {
       idx++;
     }
     double prod_hi = fX.f * one_over_pi_28[idx];
+
+    /* max value of k_hi is less than the range of an int */
     double k_hi = round(prod_hi);
     double frac = prod_hi - k_hi;
     double prod_lo = fma(fX.f, one_over_pi_28[idx + 1], frac);

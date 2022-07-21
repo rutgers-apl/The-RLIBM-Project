@@ -18,6 +18,9 @@ typedef union {
 
 float rlibm_fast_sin(float);
 
+
+/* These are generated with RZ mode with 28 bits of precision. So
+   there is no rounding */
 static const double one_over_pi_28[8] = {
   0x1.45f306cp-2,
   0x1.c9c882ap-30,
@@ -30,6 +33,16 @@ static const double one_over_pi_28[8] = {
 };
 
 static const double one_over_pi_28_exp[8] = {-29, -57, -85, -113, -141, -169, -197, -225};
+
+/* These tables are generated with teh following snippet of code that
+   uses MPFR
+
+    mpfr_set(x, pi, MPFR_RNDN);
+    mpfr_mul_d(x, x, i, MPFR_RNDN);
+    mpfr_div_d(x, x, 512, MPFR_RNDN);
+    mpfr_sin(x, x, MPFR_RNDN);
+    mpfr_d = mpfr_get_d(x, MPFR_RNDN);
+*/
 
 static const double sinpiMBy512[256] = {
   0x0p+0,
