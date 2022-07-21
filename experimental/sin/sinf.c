@@ -24,6 +24,9 @@
 /* SOFTWARE. 
 */
 
+/* Correctly rounded sin for all inputs with round-to-nearest rounding
+   mode */
+
 
 #include "sinf.h"
 
