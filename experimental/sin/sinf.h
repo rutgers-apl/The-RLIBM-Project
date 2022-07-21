@@ -34,7 +34,7 @@ static const double one_over_pi_28[8] = {
 
 static const double one_over_pi_28_exp[8] = {-29, -57, -85, -113, -141, -169, -197, -225};
 
-/* These tables are generated with teh following snippet of code that
+/* These tables are generated with the following snippet of code that
    uses MPFR
 
     mpfr_set(x, pi, MPFR_RNDN);

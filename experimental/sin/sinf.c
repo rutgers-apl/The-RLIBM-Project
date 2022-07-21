@@ -80,8 +80,8 @@ float rlibm_fast_sin(float x) {
     /* small range reduction */
     double prod = fX.f * one_over_pi_28[0];
     double kd = round(prod);
-    /* max value of kd is less than the range of an int */
-    int n = ((int64_t)kd) & 0x1;
+    /* max value of kd is less than the range of an uint64_t */
+    uint64_t n = ((uint64_t)kd);
 
     R = prod - kd;
     R = fma(fX.f, one_over_pi_28[1], R);
@@ -122,7 +122,7 @@ float rlibm_fast_sin(float x) {
       R = 1.0f - R;
     }
     R = fabs(R);
-    if (n & 0x1) s *= -1;
+    if (n) s *= -1;
   }
 
   double R512 = R * 512;
