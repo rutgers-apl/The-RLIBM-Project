@@ -125,9 +125,13 @@ float rlibm_fast_sin(float x) {
     if (n) s *= -1;
   }
 
+  
+  
   double R512 = R * 512;
+  /* N is in the range [0, 255] because R lies in [0, 0.5]*/
   unsigned N = (unsigned) R512;
-  unsigned N2 = N & 0xFF;
+
+  /* 0.001953125 is 1/512 */
   R -= N*0.001953125;
 
   double R2 = R * R;
@@ -146,7 +150,7 @@ float rlibm_fast_sin(float x) {
   cospiR *= R2;
   cospiR += 0x1p+0;
   
-  double y = sinpiMBy512[N2] * cospiR + cospiMBy512[N2] * sinpiR;
+  double y = sinpiMBy512[N] * cospiR + cospiMBy512[N] * sinpiR;
   fX.f = y;
   fX.f *= s;
   return fX.f;
