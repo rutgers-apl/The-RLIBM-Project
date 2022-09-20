@@ -24,5 +24,6 @@ double rlibm_cosh(float);
 double rlibm_sinh(float);
 double rlibm_cospi(float);
 double rlibm_sinpi(float);
+double rlibm_sinf(float);
 
 #endif
