@@ -18,9 +18,28 @@ project](https://people.cs.rutgers.edu/~sn349/rlibm/)
 
 ## Building the latest RLIBM implementations
 
-The latest functions that have been tested to produce correct results
+The latest RLIBM functions that have been tested to produce correct results
 for all representations from 10-bits to 32-bits with all the five
-rounding modes is available in libm/latest folder.
+rounding modes (FE_NEAREST, FE_UPWARD, FE_DOWNWARD, FE_TOWARDZERO) is available in the libm folder.
+
+The RLIBM library provides correctly rounded implementations for the following functions:
+
+```
+double rlibm_log10(float);
+double rlibm_log2(float);
+double rlibm_log(float);
+double rlibm_exp10(float);
+double rlibm_exp2(float);
+double rlibm_exp(float);
+double rlibm_cosh(float);
+double rlibm_sinh(float);
+double rlibm_cospi(float);
+double rlibm_sinpi(float);
+double rlibm_sinf(float);
+double rlibm_cosf(float);
+double rlibm_tanf(float);
+```
+
 
 
 ### Buidling the latest RLIBM functions
