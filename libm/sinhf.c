@@ -1,10 +1,39 @@
+/*
+
+MIT License
+
+Copyright (c) 2022 Santosh Nagarakatte, Jay Lim, Sehyeok Park, and
+Mridul Aanjaneya, Rutgers Architecture and Programming Languages
+(RAPL) Group
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+*/
+
+
 #include "rlibm.h"
 #include "sinhcosh.h"
 
 #define CONST64BYLN2 92.332482616893656768297660164535045623779296875
 #define LN2BY64 0.01083042469624914509729318723429969395510852336883544921875
 
-double rlibm_sinh(float x) {
+double rlibm_sinhf(float x) {
   float_x fx;
   fx.f = x;
   unsigned long sign = (fx.x & 0x80000000) == 0 ? 0x0 : 0x8000000000000000;

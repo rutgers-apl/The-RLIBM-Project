@@ -25,16 +25,16 @@ rounding modes (FE_NEAREST, FE_UPWARD, FE_DOWNWARD, FE_TOWARDZERO) is available 
 The RLIBM library provides correctly rounded implementations for the following functions:
 
 ```
-double rlibm_log10(float);
-double rlibm_log2(float);
-double rlibm_log(float);
-double rlibm_exp10(float);
-double rlibm_exp2(float);
-double rlibm_exp(float);
-double rlibm_cosh(float);
-double rlibm_sinh(float);
-double rlibm_cospi(float);
-double rlibm_sinpi(float);
+double rlibm_log10f(float);
+double rlibm_log2f(float);
+double rlibm_logf(float);
+double rlibm_exp10f(float);
+double rlibm_exp2f(float);
+double rlibm_expf(float);
+double rlibm_coshf(float);
+double rlibm_sinhf(float);
+double rlibm_cospif(float);
+double rlibm_sinpif(float);
 double rlibm_sinf(float);
 double rlibm_cosf(float);
 double rlibm_tanf(float);
