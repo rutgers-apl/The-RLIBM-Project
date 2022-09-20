@@ -26,5 +26,6 @@ double rlibm_cospi(float);
 double rlibm_sinpi(float);
 double rlibm_sinf(float);
 double rlibm_cosf(float);
+double rlibm_tanf(float);
 
 #endif
