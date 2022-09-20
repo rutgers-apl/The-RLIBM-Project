@@ -26,11 +26,11 @@ rounding modes is available in libm/latest folder.
 ### Buidling the latest RLIBM functions
 
 ```
-cd libm/latest
+cd libm
 make 
 ```
 
-### Using the latest RLIBM functions
+### Using the RLIBM functions
 
 The RLIBM project implements all elementary functions in double
 precision with round-to-nearest-ties-to-even mode. It returns a double
@@ -66,13 +66,13 @@ float y = (float)(temp);
 fesetround(FE_TONEAREST);
 ```
 
-Link the program with rlibm.a in libm/latest folder.
+Link the program with rlibm.a in libm/ folder.
 
 # Generating Correctly Rounded Implementations
 
-The latest RLIBM functions have been generated building on the results
-from prior prototypes:
-[RLIBM-ALL](https://github.com/rutgers-apl/rlibm-all) and [RLIBM-PROG](https://github.com/santoshn/rlibm-prog)
+The RLIBM functions have been generated using our prior prototypes:
+[RLIBM-ALL](https://github.com/rutgers-apl/rlibm-all) and
+[RLIBM-PROG](https://github.com/santoshn/rlibm-prog)
 
 Specifically, we use the polynomial generation algorithm from
 [RLIBM-PROG, PLDI
