@@ -1,41 +1,84 @@
-# The-RLIBM-Project
-[Work in Progress]
-See details about the RLIBM project here at https://people.cs.rutgers.edu/~sn349/rlibm/
+# The RLIBM Project
 
-# Building RLIBM-ALL functions
+RLIBM is a collection of elementary functions that produces correctly
+rounded results for multiple representations for multiple rounding
+modes with a single implementation. The RLIBM project makes a case for
+approximating the correctly rounded result of an elementary function
+rather than the real value of an elementary function. When we
+approximate the correctly rounded result, there is an interval of real
+values around the correctly rounded result such that producing a real
+value in this interval rounds to the correct result. This interval is
+the freedom that the polynomial approximation has for an input, which
+is larger than the freedom with prior approaches. Hence, the RLIBM
+approach has more margin to generate correct, yet, efficient
+polynomials.
 
-The RLIBM-ALL functions are in libm/rlibm-prog/libm folder.
+If you are interested, see more details about the [RLIBM
+project](https://people.cs.rutgers.edu/~sn349/rlibm/)
 
-1. Building RLIBM-ALL functions
+## Building the latest RLIBM implementations
 
-```
-cd libm/rlibm-prog/libm
-make floatrnolibm
-```
+The latest functions that have been tested to produce correct results
+for all representations from 10-bits to 32-bits with all the five
+rounding modes is available in libm/latest folder.
 
-2. Link the test harness or the functions with floatrnolibm.a in libm/rlibm-prog/libm folder
 
-3. Function prototype of the RLIBM-ALL functions for producing correctly rounded results for all rounding modes for a 32-bit float:
-
-```
-float rlibm_all_fast_log2(float);
-float rlibm_all_fast_log10(float);
-float rlibm_all_fast_log(float);
-float rlibm_all_fast_exp2(float);
-float rlibm_all_fast_exp10(float);
-float rlibm_all_fast_exp(float);
-float rlibm_all_fast_sinpi(float);
-float rlibm_all_fast_cospi(float);
-float rlibm_all_fast_sinh(float);
-float rlibm_all_fast_cosh(float);
-```
-
-4.  To generate the correctly rounded result of a 32-bit float for a specific rounding
-   mode such as FE_TONEAREST, FE_UPWARD, FE_DOWNWARD, or
-   FE_TOWARDZERO, use fesetround function as follows:
+### Buidling the latest RLIBM functions
 
 ```
-fesetround(FE_TOWARDZERO);
-float result = rlibm_all_fast_log(x);
+cd libm/latest
+make 
 ```
 
+### Using the latest RLIBM functions
+
+The RLIBM project implements all elementary functions in double
+precision with round-to-nearest-ties-to-even mode. It returns a double
+value that when rounded to any target representation or rounding mode
+produces correct rounded results. For example, the prototype of log2
+is as follows.
+
+```
+double rlibm_log2(float);
+```
+
+To produce correctly rounded results for the
+round-to-nearest-ties-to-even mode, the recommended usage in the
+application is as follows.
+
+```
+float x = .. ;
+float y = (float) rlibm_log2(x);
+
+```
+
+
+To produce correctly rounded results for other rounding modes such as
+round-towards-positive-infinity, the recommended usage in the
+application is as follows.
+
+
+```
+float x = .. ;
+double temp  = rlibm_log2(x);
+fesetround(FE_UPWARD);
+float y = (float)(temp);
+fesetround(FE_TONEAREST);
+```
+
+Link the program with rlibm.a in libm/latest folder.
+
+# Generating Correctly Rounded Implementations
+
+The latest RLIBM functions have been generated building on the results
+from prior prototypes:
+[RLIBM-ALL](https://github.com/rutgers-apl/rlibm-all) and [RLIBM-PROG](https://github.com/santoshn/rlibm-prog)
+
+Specifically, we use the polynomial generation algorithm from
+[RLIBM-PROG, PLDI
+2022](https://people.cs.rutgers.edu/~sn349/papers/rlibm-prog-pldi-2022.pdf)
+and we approximate the correctly rounded round-to-odd result, which
+allows us to produce correctly rounded results for multiple
+representations with a single polynomial approximation as with
+[RLIBM-ALL, POPL
+2022](https://people.cs.rutgers.edu/~sn349/papers/rlibmall-popl-2022.pdf).
