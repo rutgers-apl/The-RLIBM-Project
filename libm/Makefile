@@ -3,7 +3,7 @@ all: rlibm.a
 
 CC = gcc
 
-rlibmfiles = log2f logf exp10f exp2f expf log10f coshf sinhf cospif sinpif sinf cosf tanf
+rlibmfiles = log2f logf exp10f exp2f expf log10f coshf sinhf cospif sinpif sinf cosf tanf atanf
 
 
 
