@@ -29,5 +29,6 @@ double rlibm_cosf(float);
 double rlibm_tanf(float);
 double rlibm_atanf(float);
 double rlibm_asinf(float);
+double rlibm_acosf(float);
 
 #endif
