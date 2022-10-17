@@ -32,7 +32,7 @@ SOFTWARE.
 
 #define PI 3.141592653589793115997963468544185161590576171875
 
-double rlibm_rno_sinpif(float x) {
+double rlibm_sinpif(float x) {
   float_x fX;
   fX.f = x;
   unsigned long s = (fX.x & 0x80000000) == 0 ? 0x0 : 0x8000000000000000;
