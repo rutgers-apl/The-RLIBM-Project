@@ -61,20 +61,18 @@ double rlibm_acosf(float x) {
   }
   double atan_b = 0.0;
   if (R > 0.001953125) {
-    int l = 1;
-    int r = 256;
-    int m;
-    while (l < r) {
-      m = (l+r)/2;
-      if (0.00390625*m < R) {
-	l = m+1;
-      } else {
-	r = m;
-      }
+    int r;
+    {
+      double_x dx;
+      dx.d = R;
+      dx.x -= 1;
+      uint32_t value = 0x80 | ((dx.x >> 45) & 0x7f);
+      int exponent = dx.x >> 52;
+      r = value >> (8 - (exponent - 0x3f6));
     }
-    double b = r*0.00390625 - 0.001953125;
+    double b = r*0.00390625 + 0.001953125;
     R = (R - b)/(1.0L + b*R);
-    atan_b = atan_vals[r-1];
+    atan_b = atan_vals[r];
   }
   double R2 = R*R;
   y = 0x1.9e14ca1a8790bp-3;
