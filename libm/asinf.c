@@ -77,15 +77,10 @@ double rlibm_asinf(float x) {
   }
   double atan_b = 0.0;
   if (R > 0.001953125) {
-    int r;
-    {
-      double_x dx;
-      dx.d = R;
-      dx.x -= 1;
-      uint32_t value = 0x80 | ((dx.x >> 45) & 0x7f);
-      int exponent = dx.x >> 52;
-      r = value >> (8 - (exponent - 0x3f6));
-    }
+    double_x dx;
+    dx.d = R;
+    dx.x -= 1;
+    int r = dx.d * 256.0;
     double b = r*0.00390625 + 0.001953125;
     R = (R - b)/(1.0L + b*R);
     atan_b = atan_vals[r];
