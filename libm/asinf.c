@@ -28,6 +28,7 @@ SOFTWARE.
 #include <math.h>
 #include "pi.h"
 #include "rlibm.h"
+#include "sqrt.h"
 
 #define TRUE 1
 #define FALSE 0
@@ -69,7 +70,7 @@ double rlibm_asinf(float x) {
   }
   double y;
   double R = fx.f;
-  R /= sqrt(1.0 - R*R);
+  R /= Sqrt(1.0 - R*R);
   int reciprocal = FALSE;
   if (R > 1.0) {
     R = 1/R;
