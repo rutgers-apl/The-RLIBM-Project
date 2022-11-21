@@ -28,65 +28,75 @@ SOFTWARE.
 #include<math.h>
 #include "pi.h"
 #include "rlibm.h"
-
-#define TRUE 1
-#define FALSE 0
+#include <stdbool.h>
 
 #define PI_2 0x1.921fb54442d18p+0
 
 double rlibm_atanf(float x) {
-  float_x fx;
-  fx.f = x;
-  int s = (fx.x & 0x80000000) ? -1 : 1;
-  fx.x &= 0x7FFFFFFF;
-  if (fx.x > 0x7F800000) {
-    return 0.0f/0.0f;
-  }
-  if (fx.x == 0x3AAC434B) {
-    return 0x1.5886888p-10*s;
-  } 
-  if (fx.x == 0x3D8D6B23) {
-    return 0x1.1a63858p-4*s;
-  }
-  if (fx.x == 0x3FEEFCFB) {
-    return 0x1.143ec48p+0*s;
-  }
-  double y;
-  if (fx.x < 0x39B89BA3) {
-    y = 0x1.ffffffffffffep-1 * fx.f;
-  } else if (fx.x > 0x4C700517) {
-    y = 0x1.921fb5fffffffp+0;
-  } else {
-    double R = fx.f;
-    int reciprocal = FALSE;
+
+  double_x dY;
+  float_x fX;
+  fX.f = x;
+  fX.x &= 0x7FFFFFFF;
+  uint64_t sgn = (x < 0) ? 0x8000000000000000 : 0; 
+  double R, R2;
+  if (fX.x < 0x39B89BA3) {
+    dY.d = 0x1.ffffffffffffep-1*fX.f;
+    dY.x ^= sgn;
+    return dY.d;
+  } else if (fX.x <= 0x7F800000) {
+    if (fX.x <= 0x3B000000) {
+      R = fX.f;
+      R2 = R*R;
+      double temp = fma(R2, 0x1.9c79340b218c5p-3, -0x1.5555558581516p-2);
+      dY.d = R*fma(temp, R2, 0x1.0000000000005p+0);
+      dY.x ^= sgn;
+      return dY.d;
+    }
+    if (fX.x == 0x3D8D6B23) {
+      dY.d = 0x1.1a63858p-4;
+      dY.x ^= sgn;
+      return dY.d;
+    }
+    if (fX.x == 0x3FEEFCFB) {
+      dY.d = 0x1.143ec48p+0;
+      dY.x ^= sgn;
+      return dY.d;
+    }
+    if (fX.x > 0x4C700517) {
+      dY.d = 0x1.921fb5fffffffp+0;
+      dY.x ^= sgn;
+      return dY.d;
+    }
+    R = fX.f;
+    bool reciprocal = false;
     if (R > 1.0) {
       R = 1/R;
-      reciprocal = TRUE;
+      reciprocal = true;
     }
     double atan_b = 0.0;
     if (R > 0.001953125) {
       int r;
-
-      double_x dx;
-      dx.d = R;
-      dx.x -= 1;
-      uint32_t value = 0x80 | ((dx.x >> 45) & 0x7f);
-      int exponent = dx.x >> 52;
+      double_x dX;
+      dX.d = R;
+      dX.x -= 1;
+      uint32_t value = 0x80 | ((dX.x >> 45) & 0x7f);
+      int exponent = dX.x >> 52;
       r = value >> (8 - (exponent - 0x3f6));
-      
-      double b = r*0.00390625 + 0.001953125;
-      R = (R - b)/(1.0L + b*R);
+      double b = fma(r, 0.00390625, 0.001953125);
+      R = (R - b)/fma(R, b, 1.0L);
       atan_b = atan_vals[r];
     }
-    double R2 = R*R;
-    double temp1 = fma(R2, 0x1.9e14ca1a8790bp-3, -0x1.55555591c2c0ap-2);
-    double temp2 = fma(temp1, R2, 0x1.0000000000005p+0);
-    y = fma(temp2, R, atan_b);
-    
+    double R2 = R*R, temp1, temp2;
+    temp1 = fma(R2, 0x1.9e14ca1a8790bp-3, -0x1.55555591c2c0ap-2);
+    temp2 = fma(temp1, R2, 0x1.0000000000005p+0);
+    dY.d = fma(temp2, R, atan_b);
     if (reciprocal) {
-      y = PI_2 - y;
+      dY.d = PI_2 - dY.d;
     }
-  } 
-  y *= s;
-  return y;
+    dY.x ^= sgn;
+    return dY.d;
+  } else {
+    return 0.0f/0.0f;
+  }
 }
