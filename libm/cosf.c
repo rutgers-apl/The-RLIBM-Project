@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2022 Sehyeok Park and Santosh Nagarakatte, Rutgers
+Copyright (c) 2022 Sehyeok Park, Mridul Aanjaneya, and Santosh Nagarakatte, Rutgers
 Architecture and Programming Languages (RAPL) Group
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,98 +25,90 @@ SOFTWARE.
 */
 
 
-#include <math.h>
-#include "pi.h"
+
 #include "rlibm.h"
 #include "sinpicospi.h"
+#include "pi.h"
+#include "math.h"
 
-#define PI_OVER_512 0x1.921fb54442d18p-8 
+#define PI_OVER_256 0x1.921fb54442d18p-7 
+
+typedef unsigned __int128 uint128_t;
 
 double rlibm_cosf(float x) {
-  float_x fx;
-  fx.f = x; 
-  fx.x &= 0x7FFFFFFF;
-  if (fx.x >= 0x7F800000) {
-    return 0.0f/0.0f;
-  }
-  if (fx.x == 0) {
+  double_x dY;
+  float_x fX;
+  fX.f = x;
+  fX.x &= 0x7FFFFFFF;
+  uint64_t sgn = 0;
+  double R, R2;
+  if (fX.x == 0) {
     return 1.0;
-  }
-  if (fx.x == 0x491A2430) {
-    return -0x1.edfe2f8p-1;
-  }
-  if (fx.x == 0x55325019) {
-    return 0x1.9d4ba48p-1;
-  }
-  if (fx.x == 0x59443C0A) {
-    return 0x1.84bec48p-1;
-  }
-  if (fx.x == 0x5AA4542C) {
-    return 0x1.f481488p-2;
-  }
-  if (fx.x == 0x6115CB11) {
-    return 0x1.f0285d8p-1;
-  }
-  if (fx.x == 0x61703976) {
-    return 0x1.b598ab8p-2;
-  }
-  if (fx.x == 0x6F5D2D4C) {
-    return -0x1.ac093c8p-1;
-  }
-
-  int s = 1;
-  double y;
-  if (fx.x < 0x39800001) {
-    y = 0x1.fffffffffffffp-1;
-  } else {
-    double R;
-    int64_t N;
-
-    if (fx.x <= 0x48000000) {
-      double prod = fx.f * _512_over_pi_28[0];
-      double kd = floor(prod);
-      N = (int64_t) kd;
-      R = prod - kd;
-      R = fma(fx.f, _512_over_pi_28[1], R);
-      R = fma(fx.f, _512_over_pi_28[2], R);
+  } 
+  if (fX.x < 0x39800001) {
+    return 0x1.fffffffffffffp-1;
+  } else if (fX.x < 0x7F800000) {
+    int N;
+    if (fX.x < 0x4A000000) {
+      if (fX.x < 0x3C490FDB) {
+	R = fX.f;
+	R2 = R*R;
+	double temp = fma(R2, 0x1.5558e8686159fp-5, -0x1.00000000a7c61p-1);
+	return fma(temp, R2, 0x1.0000000000002p+0);
+      }
+      R = 0x1.45f306cp+6 * fX.f;
+      N = R;
+      R -= N;
+      R = fma(0x1.c9c882a53f84fp-22, fX.f, R);
       if (R > 1.0f) {
 	N += 1;
 	R -= 1.0f;
       }
     } else {
-      int x_biased_e = fx.x >> 23L;
-      int x_lsb_e = x_biased_e - 150;
-      int idx = 0;
-      while (x_lsb_e + _512_over_pi_28_exp[idx] > 0) {
-	idx++;
+      if (fX.x == 0x5922AA80) {
+	return 0x1.115d7d8p-1;
       }
-      double prod_hi =  (idx) ? fx.f * _512_over_pi_28[idx-1] : 0;
-      int64_t k_hi_int = (int64_t) prod_hi;
-      k_hi_int &= 0x3FF;
-      double k_hi = (double) k_hi_int;
-      double prod_mid = fx.f * _512_over_pi_28[idx];
-      double k_mid = floor(prod_mid);
-      double frac = prod_mid - k_mid;
-      double prod_lo = fma(fx.f, _512_over_pi_28[idx + 1], frac);
-      double k_lo = floor(prod_lo); 
-      N = (int64_t)(k_hi + k_mid + k_lo);
+      if (fX.x == 0x6A127977) {
+	return 0x1.af5c698p-2;
+      }
+      if (fX.x == 0x7908CD73) {
+	return 0x1.f3176a8p-1;
+      }
+      if (fX.x == 0x7A38AB34) {
+	return 0x1.f663298p-1;
+      }
+      int e = (fX.x >> 23) - 127;
+      int s = e - 23;
+      uint64_t m = (fX.x&0x7FFFFF)|1<<23;
 
-      R = prod_lo - k_lo;
-      R = fma(fx.f, _512_over_pi_28[idx + 2], R);
-      R = fma(fx.f, _512_over_pi_28[idx + 3], R); 
-      if (R > 1.0f) {
-	N += 1;
-	R -= 1.0f;
+      /* 256 bits of 1/pi in 4 64-bit integers */
+      static const uint64_t ipi[] = {0xfe5163abdebbc562, 0xdb6295993c439041, 0xfc2757d1f534ddc0, 0xa2f9836e4e441529};
+      uint128_t p0 = (uint128_t)m*ipi[0];
+      uint128_t p1 = (uint128_t)m*ipi[1]; p1 += p0>>64;
+      uint128_t p2 = (uint128_t)m*ipi[2]; p2 += p1>>64;
+      uint128_t p3 = (uint128_t)m*ipi[3]; p3 += p2>>64;
+      uint64_t p3h = p3>>64, p3l = p3, p2l = p2, p1l = p1;
+      uint64_t a;
+      if (s < 57) {
+	N = (p3h<<(7+s))|(p3l>>(57-s));
+	a = (p3l<<(7+s))|(p2l>>(57-s));
+      } else if (s == 57) {
+	N = p3l;
+	a = p2l;
+      } else {
+	N = (p3l<<(s-57))|(p2l>>(121-s));
+	a = (p2l<<(s-57))|(p1l>>(121-s));
       }
+      R = a*0x1p-64;
     }
-    R *= PI_OVER_512;
+    R *= PI_OVER_256;
 
     double sinpiM;
     double cospiM;
     
-    unsigned N2 = N & 0xFF;
-    unsigned I = (N >> 8) + 1;
-    s = (I & 0x2) ? -1 : 1;
+    unsigned N2 = N & 0x7F;
+    unsigned I = (N >> 7) + 1;
+    if (I & 0x2) sgn ^= 0x8000000000000000;
 
     if (I & 1) {
       if (N2 == 0) {
@@ -124,34 +116,27 @@ double rlibm_cosf(float x) {
 	sinpiM = 0.0;
       } else {
 	N2++;
-	R = PI_OVER_512 - R;
-	cospiM = sinpiMBy512[256 - N2];
-	sinpiM = cospiMBy512[256 - N2];
+	R = PI_OVER_256 - R;
+	cospiM = sinpiMBy256[128 - N2];
+	sinpiM = cospiMBy256[128 - N2];
       }
     } else {
-      cospiM = sinpiMBy512[N2];
-      sinpiM = cospiMBy512[N2];
+      cospiM = sinpiMBy256[N2];
+      sinpiM = cospiMBy256[N2];
     }
-   
-    double R2 = R * R;
+    R2 = R*R;
+    double sinpiR, cospiR, temp1, temp2; 
 
-    double sinpiR, cospiR; 
+    temp1 = fma(R2, 0x1.1111de524b6fp-7, -0x1.55555555d376p-3);
+    sinpiR = R*fma(R2, temp1, 0x1.0000000000001p+0);
      
-    sinpiR = 0x1.110dd89739b5cp-7;
-    sinpiR *= R2;
-    sinpiR += -0x1.55555554ce812p-3;
-    sinpiR *= R2;
-    sinpiR += 0x1.ffffffffffffep-1;
-    sinpiR *= R;
+    temp2 = fma(R2, 0x1.555488594da9dp-5, -0x1.ffffffff83643p-2);
+    cospiR = fma(R2, temp2, 0x1.ffffffffffffcp-1);
     
-    cospiR = 0x1.5553dd3610b9p-5;
-    cospiR *= R2;
-    cospiR += -0x1.ffffffff9c28fp-2; 
-    cospiR *= R2;
-    cospiR += 0x1.fffffffffffffp-1; 
-    
-    y = sinpiM * sinpiR + cospiM * cospiR;
+    dY.d = fma(sinpiM, sinpiR, cospiM*cospiR);
+    dY.x ^= sgn;
+    return dY.d;
+  } else {
+    return 0.0f/0.0f;
   }
-  y *= s;
-  return y;
 }

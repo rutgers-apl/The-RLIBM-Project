@@ -71,6 +71,9 @@ double rlibm_sinf(float x) {
 	dY.x ^= sgn;
 	return dY.d;
       }
+
+      /* 80 bits of 1/pi stored as 40-bit pieces in two 64-bit
+	 integers */
       uint64_t p0 = m*0x441529fc27;
       uint64_t p1 = m*0xa2f9836e4e; p1+=(p0>>40);
       N = (p1>>(33-s));
@@ -97,6 +100,7 @@ double rlibm_sinf(float x) {
 	return dY.d;
       }
 
+      /* 256 bits of 1/pi for range reduction with large arguments */
       static const uint64_t ipi[] = {0xfe5163abdebbc562, 0xdb6295993c439041, 0xfc2757d1f534ddc0, 0xa2f9836e4e441529};
       uint128_t p0 = (uint128_t)m*ipi[0];
       uint128_t p1 = (uint128_t)m*ipi[1]; p1 += p0>>64;
