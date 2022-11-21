@@ -82,16 +82,6 @@ double rlibm_atanf(float x) {
     double temp1 = fma(R2, 0x1.9e14ca1a8790bp-3, -0x1.55555591c2c0ap-2);
     double temp2 = fma(temp1, R2, 0x1.0000000000005p+0);
     y = fma(temp2, R, atan_b);
-
-#if 0    
-    y = 0x1.9e14ca1a8790bp-3;
-    y *= R2;
-    y += -0x1.55555591c2c0ap-2;
-    y *= R2;
-    y += 0x1.0000000000005p+0;
-    y *= R;
-    y += atan_b;
-#endif
     
     if (reciprocal) {
       y = PI_2 - y;
