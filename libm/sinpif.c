@@ -51,7 +51,7 @@ double rlibm_sinpif(float x) {
     if (fX.x >= 0x7F800000) {
         return 0.0/0.0;
     }
-    return 0.0;
+    return (s == 0) ? 0.0: -0.0;
   }
   
   double xp = fX.f * 512;
@@ -59,18 +59,22 @@ double rlibm_sinpif(float x) {
   unsigned N2 = N & 0xFF;
   unsigned I = N >> 8;
   double R = fX.f - N * 0.001953125;
-  if (I & 0x2) s ^= 0x8000000000000000;
+
   
   double_x dX;
     
   // More special cases when sinpi(x) is exactly representable
   if (R == 0 && N2 == 0) {
+
     if (I & 0x1) {
+      if (I & 0x2) s ^= 0x8000000000000000;
       dX.d = 1.0;
       dX.x |= s;
       return dX.d;
     } else {
-      return 0.0;
+      dX.d = 0.0;
+      dX.x |= s;
+      return dX.d;
     }
   }
 
@@ -78,6 +82,8 @@ double rlibm_sinpif(float x) {
       N2 = 255 - N2;
       R = 0.001953125 - R;
   }
+
+  if (I & 0x2) s ^= 0x8000000000000000;
 
   dX.d = R;
   double R2 = R * R;

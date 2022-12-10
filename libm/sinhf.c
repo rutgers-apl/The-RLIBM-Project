@@ -39,7 +39,7 @@ double rlibm_sinhf(float x) {
   unsigned long sign = (fx.x & 0x80000000) == 0 ? 0x0 : 0x8000000000000000;
   fx.x &= 0x7FFFFFFF;
 
-  if (fx.x == 0) return 0.0;
+  if (fx.x == 0) return x;
   
   // Take care of special cases
   if (fx.x <= 971544424) {
