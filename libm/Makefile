@@ -12,7 +12,7 @@ rlibmobj = $(patsubst %, $(rlibmobjdir)/%.o, $(rlibmfiles))
 
 $(rlibmobjdir)/%.o: $(rlibmsrcdir)/%.c
 	@mkdir -p $(rlibmobjdir)
-	$(CC) -std=c17 -O3 -march=native -c $^  -o $@
+	$(CC) -O3 -march=native -c $^  -o $@
 
 rlibm.a: $(rlibmobj)
 	ar rc $@ $^

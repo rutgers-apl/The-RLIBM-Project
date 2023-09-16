@@ -2,7 +2,7 @@
 
 MIT License
 
-Copyright (c) 2022 Santosh Nagarakatte, Jay Lim, Sehyeok Park, and
+Copyright (c) 2023 Santosh Nagarakatte, Jay Lim, Sehyeok Park, and
 Mridul Aanjaneya, Rutgers Architecture and Programming Languages
 (RAPL) Group
 
@@ -52,8 +52,8 @@ double rlibm_log2f(float x) {
     }
 
     // Special case when we have denormal input and exact result
-    int exp;
-    spec.f = frexpf(fix.f, &exp);
+    int exp = (fix.x >> 23) - 126;
+    spec.x = (126 << 23) | (fix.x & 0x7FFFFF);
     if (spec.x == 0x3f000000) return (double)(exp - 1);
 
     fix.f *= 8.388608e+06;
@@ -79,14 +79,12 @@ double rlibm_log2f(float x) {
 
   double y = 0.0;
 
-
-  // FMA coefficients
   double coeffs[] = {
-		     1.4426950408932206482148785653407685458660125732421875000000000000000000e+00,
-		     -7.2134752833238291458428648184053599834442138671875000000000000000000000e-01,
-		     4.8090208952661678276641055163054261356592178344726562500000000000000000e-01,
-		     -3.6134046214924120388189976438297890126705169677734375000000000000000000e-01,
-		     3.2717964062254517587646773790766019374132156372070312500000000000000000e-01		     
+    0x1.71547652bcde3p+0,
+    -0x1.7154769679dd8p-1,
+    0x1.ec7198ec61291p-2,
+    -0x1.72033bee9c2d6p-2,
+    0x1.4f082e01903edp-2
   };
   
   double xsquare = f*f;
