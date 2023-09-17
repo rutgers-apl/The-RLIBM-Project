@@ -1,4 +1,4 @@
-all: rlibm.a
+lsall: rlibm.a
 
 CC = gcc
 
@@ -12,7 +12,7 @@ rlibmobj = $(patsubst %, $(rlibmobjdir)/%.o, $(rlibmfiles))
 
 $(rlibmobjdir)/%.o: $(rlibmsrcdir)/%.c
 	@mkdir -p $(rlibmobjdir)
-	$(CC) -O3 -march=native -c $^  -o $@
+	$(CC) -O3 -std=c17  -march=native -c $^  -o $@
 
 rlibm.a: $(rlibmobj)
 	ar rc $@ $^
