@@ -2,7 +2,7 @@
 
 MIT License
 
-Copyright (c) 2022 Santosh Nagarakatte, Jay Lim, Sehyeok Park, and
+Copyright (c) 2023 Santosh Nagarakatte, Jay Lim, Sehyeok Park, and
 Mridul Aanjaneya, Rutgers Architecture and Programming Languages
 (RAPL) Group
 
@@ -26,39 +26,51 @@ SOFTWARE.
 
 */
 
+/* See our technical report for details on range reduction:
+ * 
+ * RLIBM-32: High Performance Correctly Rounded Math Libraries for
+ * 32-bit Floating Point Representations. Jay P Lim and Santosh
+ * Nagarakatte Department of Computer Science, Rutgers University,
+ * Technical Report DCS-TR-754: https://arxiv.org/pdf/2104.04043.pdf
+ * 
+ */
 
 #include <math.h>
 #include "rlibm.h"
 #include "exp2.h"
 
-double rlibm_exp2f(float x) {
+double rlibm_exp2f(float x) { 
+  double_x dY;
   float_x fx;
   fx.f = x;
   
   // Take care of special cases
   if ((fx.x & 0x7FFFFFFF) == 0) return 1.0;
   
-  if (fx.x <= 876128826) {
-    if (fx.x <= 867740218) return 1.0000000298023223876953125;
-    return 1.0000000894069671630859375;
+  if (fx.x <= 0x3438aa3a) {
+    if (fx.x <= 0x33b8aa3a) return 0x1.0000008p+0;
+    return 0x1.0000018p+0;
   }
   
-  if (1124073472 <= fx.x && fx.x <= 3015223867) {
+  if (0x43000000 <= fx.x && fx.x <= 0xb3b8aa3b) {
     if (fx.x < 0x80000000) {
-      if (fx.x < 0x7F800000) return 3.40282361850336062550457001444955389952e+38;
+      if (fx.x < 0x7F800000) return 0x1.ffffff8p+127; 
       if (fx.x == 0x7F800000) return 1.0 / 0.0;
       return 0.0/0.0;
     }
     
     // negative counterpart
-    if (fx.x <= 3006835259) return 0.99999998509883880615234375;
+    if (fx.x <= 0xb338aa3b) return 0x1.ffffff8p-1;
     
-    return 0.99999995529651641845703125;
+    return 0x1.fffffe8p-1;
   }
   
-  if (fx.x >= 3272998913) {
-    if (fx.x == 0xFF800000) return 0.0;
-    if (fx.x < 0xFF800000) return ldexp(1.0, -151);
+  if (fx.x >= 0xc3160001) {
+    if (fx.x == 0xFF800000) return 0.0; 
+    if (fx.x < 0xFF800000) {
+      dY.x = 0x3680000000000000;
+      return dY.d;
+    }
     return 0.0/0.0;
   }
   
@@ -71,10 +83,13 @@ double rlibm_exp2f(float x) {
   
   int M = N1 / 64;
   int J = N2;
-  double R = x - N * 0.015625;
+  double R = x - N * 0x1p-6;
   
   if (R == 0.0 && N2 == 0) {
-    return ldexp(1.0, M);
+
+    dY.d = 1.0;
+    dY.x += ((uint64_t) M << 52);    
+    return dY.d;
   }
 
   double y = 0.0;
@@ -102,5 +117,9 @@ double rlibm_exp2f(float x) {
   }
   
   // Perform output compensation
-  return y * ldexp(exp2JBy64[J], M);
+  
+  dY.d = exp2JBy64[J];
+  dY.x += ((uint64_t)M << 52);
+  y *= dY.d;
+  return y;
 }
