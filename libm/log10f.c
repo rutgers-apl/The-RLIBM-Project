@@ -28,7 +28,7 @@ SOFTWARE.
 
 
 #include "rlibm.h"
-#include "log10.h"
+#include "log.h"
 #include <math.h>
 
 #define LOG102HIGH 0.30102999566398114250631579125183634459972381591796875
@@ -82,7 +82,7 @@ double rlibm_log10f(float x) {
   fit.x |= 0x3F800000;
   
   double f = fix.f - fit.f;
-  f *= log_oneByF[FIndex];
+  f *= __log_oneByF[FIndex];
 
   double y;
 
@@ -170,7 +170,7 @@ double rlibm_log10f(float x) {
   }
   
   y += m * LOG102LOW;
-  y += log10_lut[FIndex];
+  y += __log10_lut[FIndex];
   y += m * LOG102HIGH;
   
   return y;

@@ -28,7 +28,7 @@ SOFTWARE.
 
 
 #include "rlibm.h"
-#include "log2.h"
+#include "log.h"
 #include <math.h>
 
 double rlibm_log2f(float x) {

@@ -62,7 +62,7 @@ double rlibm_logf(float x) {
   fit.x |= 0x3F800000;
   
   double f = fix.f - fit.f;
-  f *= log_oneByF[FIndex];
+  f *= __log_oneByF[FIndex];
   
   double y = 0.0;
   
@@ -129,7 +129,7 @@ double rlibm_logf(float x) {
     }    
   }
   
-  y += ln_lutHIGH[FIndex];
+  y += __ln_lutHIGH[FIndex];
   y += m * LN2HIGH;
   
   return y;
