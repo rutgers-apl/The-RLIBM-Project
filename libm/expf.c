@@ -2,7 +2,7 @@
 
 MIT License
 
-Copyright (c) 2022 Santosh Nagarakatte, Jay Lim, Sehyeok Park, and
+Copyright (c) 2023 Santosh Nagarakatte, Jay Lim, Sehyeok Park, and
 Mridul Aanjaneya, Rutgers Architecture and Programming Languages
 (RAPL) Group
 
@@ -30,39 +30,43 @@ SOFTWARE.
 #include "rlibm.h"
 #include "exp2.h"
 
-double rlibm_expf(float x) {
+double rlibm_expf(float x) { 
+  double_x dY;
   float_x fx;
   fx.f = x;
-  
+
   // Take care of special cases
   if ((fx.x & 0x7FFFFFFF) == 0) return 1.0;
 
-  if (fx.x <= 872415231) {
-    if (fx.x <= 864026623) return 1.0000000298023223876953125;
-    return 1.0000000894069671630859375;
+  if (fx.x <= 0x33ffffff) {
+    if (fx.x <= 0x337fffff) return 0x1.0000008p+0;
+    return 0x1.0000018p+0;
   }
 
-  if (1118925336 <= fx.x && fx.x <= 3011510272) {
+  if (0x42b17218 <= fx.x && fx.x <= 0xb3800000) {
     if (fx.x < 0x80000000) {
-      if (fx.x < 0x7F800000) return 3.40282361850336062550457001444955389952e+38;
+      if (fx.x < 0x7F800000) return 0x1.ffffff8p+127;
       if (fx.x == 0x7F800000) return 1.0 / 0.0;
       return 0.0/0.0;
     }
     
     // negative counterpart
-    if (fx.x <= 3003121664) return 0.99999998509883880615234375;
+    if (fx.x <= 0xb3000000) return 0x1.ffffff8p-1; 
     
-    return 0.99999995529651641845703125;
+    return 0x1.fffffe8p-1; 
   }
 
-  if (fx.x >= 3268407733) {
+  if (fx.x >= 0xc2cff1b5) {
     if (fx.x == 0xFF800000) return 0.0;
-    if (fx.x < 0xFF800000) return ldexp(1.0, -151);
+    if (fx.x < 0xFF800000) {
+      dY.x = 0x3680000000000000;
+      return dY.d;
+    }
     return 0.0/0.0;
   }
   
   // Perform range reduction
-  double xp = x * 92.332482616893656768297660164535045623779296875;
+  double xp = x * 0x1.71547652b82fep+6;
   int N = (int)xp;
   int N2 = N % 64;
   if (N2 < 0) N2 += 64;
@@ -70,8 +74,7 @@ double rlibm_expf(float x) {
   
   int M = N1 / 64;
   int J = N2;
-  double R = x - N *
-  0.01083042469624914509729318723429969395510852336883544921875;
+  double R = x - N * 0x1.62e42fefa39efp-7;
   
   double_x dX;
   dX.d = R;
@@ -126,6 +129,8 @@ double rlibm_expf(float x) {
   }
   
   // Perform output compensation
-  y *= ldexp(exp2JBy64[J], M);
+  dY.d = exp2JBy64[J];
+  dY.x += ((uint64_t)M << 52);
+  y *= dY.d;
   return y;
 }
