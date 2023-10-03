@@ -24,7 +24,7 @@ float rlibm_fast_cosh_v4(float x) {
   if (N2 < 0) N2 += 64;
   int N1 = N - N2;
   int I = N1 / 64;
-  // redued input x'
+  // reduced input x'
   double R = fx.f - N * LN2BY64;
   // x' squared
   double R2 = R * R;
