@@ -36,14 +36,14 @@ double rlibm_log2f(float x) {
   fix.f = x;
   int m = 0;
 
-  if (fix.x < 0x800000 || fix.x >= 0x7F800000) {
+  if (__builtin_expect(fix.x < 0x800000 || fix.x >= 0x7F800000, 0)) {
     if ((fix.x & 0x7FFFFFFF) == 0) { // log(+/-0) = -infty
       fix.x = 0xFF800000;
       return fix.f;
     }
     
     if (fix.x > 0x7FFFFFFF) { // Log(-val) = NaN
-      return (x - x) / 0;
+      return (x - x) / 0.0f;
         
     }
     
@@ -64,7 +64,7 @@ double rlibm_log2f(float x) {
   m -= 127;
   fix.x &= 0x007FFFFF;
   
-  if (fix.x == 0) {
+  if (__builtin_expect(fix.x == 0, 0)) {
     return (double)m;
   }
   

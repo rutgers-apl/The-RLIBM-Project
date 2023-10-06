@@ -2,7 +2,7 @@
 
 MIT License
 
-Copyright (c) 2022 Santosh Nagarakatte, Jay Lim, Sehyeok Park, and
+Copyright (c) 2023 Santosh Nagarakatte, Jay Lim, Sehyeok Park, and
 Mridul Aanjaneya, Rutgers Architecture and Programming Languages
 (RAPL) Group
 
@@ -31,8 +31,8 @@ SOFTWARE.
 #include "log.h"
 #include <math.h>
 
-#define LOG102HIGH 0.30102999566398114250631579125183634459972381591796875
-#define LOG102LOW  5.27074231034726570126349709198449199648263806413338306011695522101945243775844573974609375e-17
+#define LOG102HIGH 0x1.34413509f79fep-2
+#define LOG102LOW  0x1.e623e2566b02ep-55
 
 double rlibm_log10f(float x) {
   float_x fix, fit;
@@ -46,7 +46,7 @@ double rlibm_log10f(float x) {
       }
       
       if (fix.x > 0x7FFFFFFF) { // Log(-val) = NaN
-          return (x - x) / 0;
+          return (x - x) / 0.0f;
           
       }
       
