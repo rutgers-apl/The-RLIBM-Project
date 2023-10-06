@@ -45,7 +45,7 @@ double rlibm_acosf(float);
 
 
 
-### Buidling the latest RLIBM functions
+### Building the latest RLIBM functions
 
 ```
 cd libm

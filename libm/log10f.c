@@ -103,7 +103,7 @@ double rlibm_log10f(float x) {
       y =  fma(f, coeffs[0], temp3);      
 
     } else {
-      // 2nd sub-doomain
+      // 2nd sub-domain
       if(f == 0x1.1fddb0d3224f3p-9){
 	y = 0x1.f386956531508p-11;
       } else{
