@@ -22,7 +22,6 @@ SOFTWARE.
 
 #include <math.h>
 #include "rlibm.h"
-#include "sinpicospi.h"
 #include "pi.h"
 
 
@@ -30,112 +29,92 @@ SOFTWARE.
 
 typedef unsigned __int128 uint128_t;
 
-
-double rlibm_sinf(float x) {  
-  double y;
-  float_x fX;
-  fX.f = x;
-  double sgns[2] = {1.0, -1.0};
-  double sgn = sgns[fX.x>>31];
-  fX.x &= 0x7FFFFFFF;
-  double R, R2;
-  if (fX.x < 0x39E89769) {
-    y = fX.f*0x1.ffffffffffffep-1;
-    return y*sgn;
-  } else if (fX.x < 0x7F800000) {	  
-    int s = (fX.x >> 23) - 150;
+double rlibm_sinf(float x) {
+  float_x fX = {.f=x};
+  uint32_t b = fX.x<<1;
+  if (b < 0xff000000) {
+    int k;
+    long long a;
+    int s = ((fX.x>>23)&0xff) - 150;
     uint64_t m = (fX.x&0x7FFFFF)|1<<23;
-    int N;
-    uint64_t a;
-    if (fX.x < 0x4A000000) {
-      if (fX.x < 0x3CC90FDB) {
-	R = fX.f;
-	R2 = R*R;
-	double temp = fma(R2, 0x1.11130658ac4e4p-7, -0x1.55555558c07f5p-3);
-	y = R*fma(temp, R2, 0x1.0000000000011p+0);
-	return y*sgn;
+    double z, z2;
+    if (b < 0x9d000000) {
+      if (__builtin_expect(b == 0x95fbd9c8, 0)) {
+	double y = -0x1.ff6dc18p-1*__builtin_copysign(1.0, x);
+	return y;
       }
-      if (fX.x == 0x3F3ADC51) {
-	y = 0x1.5568898p-1;
-	return y*sgn;
+      if (__builtin_expect(b == 0x995c4a68, 0)) {
+	double y = -0x1.181a858p-6*__builtin_copysign(1.0, x);
+	return y;
       }
-      if (fX.x == 0x4371ADE3) {
-	y = 0x1.c5b4ab8p-3;
-	return y*sgn;
+      if (__builtin_expect(b == 0x9cb0e51c, 0)) {
+	double y = -0x1.851fd78p-14*__builtin_copysign(1.0, x);
+	return y;
       }
-      /* 80 bits of 1/pi stored as 40-bit pieces in two 64-bit
-	 integers */
+      if (b < 0x79921fb6) {
+	if (b < 0x73d12ed2) return x*0x1.ffffffffffffep-1;
+	z = x;
+	z2 = z*z;
+	double temp = fma(z2, 0x1.11130658ac4e4p-7, -0x1.55555558c07f5p-3);
+	return z*fma(temp, z2, 0x1.0000000000011p+0);
+      }
       uint64_t p0 = m*0x441529fc27;
       uint64_t p1 = m*0xa2f9836e4e; p1+=(p0>>40);
-      N = (p1>>(33-s));
+      k = (p1>>(33-s));
       a = p1<<(31+s)|((p0<<24)>>(33-s));
     } else {
-      if (fX.x == 0x523947F6) {
-	y = -0x1.24f23b8p-1;
-	return y*sgn;
+      if (__builtin_expect(b == 0xa4728fec, 0)) {
+	double y = -0x1.24f23b8p-1*__builtin_copysign(1.0, x);
+	return y;
       }
-      if (fX.x == 0x55CAFB2A) {
-	y = -0x1.fcf42d8p-1;
-	return y*sgn;
+      if (__builtin_expect(b == 0xab95f654, 0)) {
+	double y = -0x1.fcf42d8p-1*__builtin_copysign(1.0, x);
+	return y;
       }
-      if (fX.x == 0x5DADD689) {
-	y = -0x1.e9f93b8p-1;
-	return y*sgn;
+      if (__builtin_expect(b == 0xcf524856, 0)) {
+	double y = -0x1.ff57018p-1*__builtin_copysign(1.0, x);
+	return y;
       }
-      if (fX.x == 0x6386134E) {
-	y = 0x1.f965ce8p-1;
-	return y*sgn;
+      if (__builtin_expect(b == 0xe6487e0c, 0)) {
+	double y = 0x1.2875078p-2*__builtin_copysign(1.0, x);
+	return y;
       }
-      if (fX.x == 0x67A9242B) {
-	y = -0x1.ff57018p-1;
-	return y*sgn;
-      }
-      if (fX.x == 0x73243F06) {
-	y = 0x1.2875078p-2;
-	return y*sgn;
-      }
-      /* 256 bits of 1/pi for range reduction with large arguments */
-      static const uint64_t ipi[] = {0xfe5163abdebbc562, 0xdb6295993c439041, 0xfc2757d1f534ddc0, 0xa2f9836e4e441529};
-      uint128_t p0 = (uint128_t)m*ipi[0];
-      uint128_t p1 = (uint128_t)m*ipi[1]; p1 += p0>>64;
-      uint128_t p2 = (uint128_t)m*ipi[2]; p2 += p1>>64;
-      uint128_t p3 = (uint128_t)m*ipi[3]; p3 += p2>>64;
+      static const uint64_t ipi[] = {0xdb6295993c439041, 0xfc2757d1f534ddc0, 0xa2f9836e4e441529};
+      uint128_t p1 = (uint128_t)m*ipi[0];
+      uint128_t p2 = (uint128_t)m*ipi[1]; p2 += p1>>64;
+      uint128_t p3 = (uint128_t)m*ipi[2]; p3 += p2>>64;
       uint64_t p3h = p3>>64, p3l = p3, p2l = p2, p1l = p1;
       if (s < 57) {
-	N = (p3h<<(7+s))|(p3l>>(57-s));
+	k = (p3h<<(7+s))|(p3l>>(57-s));
 	a = (p3l<<(7+s))|(p2l>>(57-s));
       } else if (s == 57) {
-	N = p3l;
+	k = p3l;
 	a = p2l;
       } else {
-	N = (p3l<<(s-57))|(p2l>>(121-s));
+	k = (p3l<<(s-57))|(p2l>>(121-s));
 	a = (p2l<<(s-57))|(p1l>>(121-s));
       }
-    } 
-    long N2 = N & 0x7F;
-    unsigned I = N >> 7;
-    if (I & 0x2) sgn *= -1.0;
-    N2 ^= ~(0xFFFFFFFF+(I & 0x1));
-    N2 += 128&((I & 0x1)<<7);
-    a ^= ~(0xFFFFFFFFFFFFFFFF+(I & 0x1));
-    R = a*0x1p-64*PI_OVER_256;
-
-    double sinpiM = sinpiMBy256[(unsigned)N2];
-    double cospiM = cospiMBy256[(unsigned)N2];
- 
-    double temp1, temp2;
-    R2 = R*R;
-
-    temp1 = fma(R2, 0x1.11154bcb5c9e2p-7, -0x1.555555583bf78p-3);
-    y = cospiM*R*fma(temp1, R2, 0x1.000000000000cp+0);
-    if (N2 == 0) {
-      return y*sgn;
     }
-    temp2 = fma(R2, 0x1.5554a56a7705fp-5, -0x1.ffffffffad9f2p-2);
-    y += sinpiM*fma(temp2, R2, 0x1.ffffffffffffep-1);
-    
-    return y*sgn;
+    long sm = a>>63;
+    k -= sm;
+    k += (fX.x>>31)<<8;
+    z = a*0x1p-64;
+    z2 = z*z;
+    double sinpiK = sinpiMBy256TwoPi[k&511];
+    double cospiK = sinpiMBy256TwoPi[(k+128)&511];
+    //y=0x1.fffffffffffffp-1 x^(0) + -0x1.3bd3cc9baf37fp-14 x^(2) + 0x1.03c102099750dp-30 x^(4)
+    double cospiZ = fma(z2, 0x1.03c102099750dp-30, -0x1.3bd3cc9baf37fp-14);
+    cospiZ = fma(cospiZ, z2, 0x1.fffffffffffffp-1);
+    double z3 = z2*z;
+    //y=0x1.921fb54442d1cp-7 x^(1) + -0x1.4abbce67633e5p-22 x^(3) + 0x1.46a562b83e363p-39 x^(5)
+    z *= 0x1.921fb54442d1cp-7;
+    double sinpiZ = fma(z2, 0x1.46a562b83e363p-39, -0x1.4abbce67633e5p-22);
+    sinpiZ = fma(sinpiZ, z3, z);
+    return fma(sinpiK, cospiZ, cospiK*sinpiZ);
   } else { 
     return 0.0f/0.0f;
   }
 }
+
+
+
