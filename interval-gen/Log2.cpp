@@ -77,6 +77,33 @@ void SpecCaseRedInt(float x,
 
 
 double RangeReduction(float x) {
+
+  float_x inp = {.f = x};
+  uint32_t ux = inp.x;
+  uint64_t m = ux & 0x7FFFFF;
+  m = m << 29;
+  int exp = (ux >> 23) - 127;
+  
+  if(__builtin_expect(ux < 0x800000 || ux >= 0x7F800000, 0)){
+    // subnormal
+    int nz = __builtin_clzll(m);
+    m <<= nz-11;
+    m &= ~0ul>>12;
+    exp = exp - (nz - 12);
+  }
+
+  double_x  xd = {.x = m | 0x3FF0000000000000ULL};
+  uint64_t FIndex = m>> 45;
+  uint64_t fm = (FIndex) << 45;
+  double_x  xf = {.x = fm |0x3FF0000000000000ULL};
+  double f = xd.d - xf.d;  
+  
+  return f * rlibm_OneByF[FIndex];
+
+
+
+#if 0
+  /* old range reduction */
   float_x fix, fit;
   
   int m = 0;
@@ -97,11 +124,54 @@ double RangeReduction(float x) {
   
   double f = fix.f - F;
   return f * rlibm_OneByF[FIndex];
+#endif  
+  
 }
 
 
 bool compute_special_case(float x, double& res){
 
+  float_x inp = {.f = x};
+  uint32_t ux = inp.x;
+  uint64_t m = ux & 0x7FFFFF;
+  m = m << 29;
+  int exp = (ux >> 23) - 127;
+  
+  if(__builtin_expect(ux < 0x800000 || ux >= 0x7F800000, 0)){
+
+    if (ux==0||ux==(1u<<31)){
+      res = -__builtin_inff(); // +0.0 || -0.0
+      return true;
+    }
+
+    uint32_t inf_or_nan = ((ux>>23)&0xff) == 0xff, nan = inf_or_nan && (ux<<9);
+
+    if (ux>>31 && !nan) {
+     res =  __builtin_nanf("-");
+     return true;
+    }
+
+    if (inf_or_nan) {
+      res = x;
+      return true;
+    }
+
+    // subnormal
+    int nz = __builtin_clzll(m);
+    m <<= nz-11;
+    m &= ~0ul>>12;
+    exp = exp - (nz - 12);
+  }
+
+  /* power of 2 */
+  if(__builtin_expect(!m, 0)) {
+      res= exp;
+      return true;
+    }
+  return false;
+  
+#if 0
+  /* old special cases for log2 for interval generation */
   float_x fx;
   fx.f = x;
   if (x == 0.0) {
@@ -122,11 +192,41 @@ bool compute_special_case(float x, double& res){
     res = (exp - 1);
     return true;
   }
-  
+
   return false;
+#endif  
+  
+
 }
 
 double OutputCompensation(float x, double yp) {
+
+  float_x inp = {.f = x};
+  uint32_t ux = inp.x;
+  uint64_t m = ux & 0x7FFFFF;
+  m = m << 29;
+  int exp = (ux >> 23) - 127;
+  
+  if(__builtin_expect(ux < 0x800000 || ux >= 0x7F800000, 0)){
+    // subnormal
+    int nz = __builtin_clzll(m);
+    m <<= nz-11;
+    m &= ~0ul>>12;
+    exp = exp - (nz - 12);
+  }
+  double_x  xd = {.x = m | 0x3FF0000000000000ULL};
+  uint64_t FIndex = m>> 45;
+  uint64_t fm = (FIndex) << 45;
+  double_x  xf = {.x = fm |0x3FF0000000000000ULL};
+  double f = xd.d - xf.d;  
+  
+  f *= rlibm_OneByF[FIndex];
+
+  return yp +  rlibm_log2F[FIndex] + exp;
+  
+
+#if 0
+  /* old output compensation */
   float_x fix, fit;
   
   int m = 0;
@@ -144,6 +244,8 @@ double OutputCompensation(float x, double yp) {
   int FIndex = fit.x >> 16;
   
   return yp + rlibm_log2F[FIndex] + m;
+
+#endif   
 }
 
 
