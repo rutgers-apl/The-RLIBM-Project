@@ -25,7 +25,7 @@
 */
 
 /* 
-   Implementation of correctly rounded log2(x) in single precision with
+   Implementation of correctly rounded log2f(x) in single precision with
    all four rounding modes (round-to-nearest, round-to-zero, round-up,
    round-down) and for all representations from 10-to-32-bits.
 
@@ -42,15 +42,15 @@
    equivalent to x' and the remaining 16 bits are zeros. Hence, f
    represents the difference (x' - F).
 
-   log2(x) = log2(x' * 2^{exp}) = log2(x') + exp
-           = log2(F(f/F + )) + exp
-           = log2(F) + log2(f/F + 1) + exp
+   log2f(x) = log2f(x' * 2^{exp}) = log2f(x') + exp
+           = log2f(F(f/F + 1)) + exp
+           = log2f(F) + log2f(f/F + 1) + exp
 
-   We create look up tables for all values of log2(F). There are 128
+   We create look up tables for all values of log2f(F). There are 128
    entries because the leading bit is always 1. Similarly, we create
    lookup tables with 128 entries for 1/F.
 
-   Finally, log2(f/F + 1) is approximated by a polynomial P(f/F)
+   Finally, log2f(f/F + 1) is approximated by a polynomial P(f/F)
    generated with the RLIBM method as described in the papers at
    https://people.cs.rutgers.edu/~sn349/rlibm/
 */
