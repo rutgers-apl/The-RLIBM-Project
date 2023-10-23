@@ -104,81 +104,72 @@ double rlibm_logf(float x) {
 
   f *= __log_oneByF[FIndex];
 
-
-  double coeffs[5] = {
-    0x1.0000000007a9cp+0,
-    -0x1.0000004ef6ca5p-1,
-    0x1.55565c6f85cc2p-2,
-    -0x1.00af53c746b32p-2,    
-    0x1.e767c61247c1ep-3
+  double coeffs[6] = {
+    0x1.ffffffffffd4ep-1,
+    -0x1.ffffffdf44487p-2,
+    0x1.5554c9220e58p-2,
+    -0x1.fe7bbe4859cbbp-3,
+    0x1.813bb7d79b17p-4,
+    0x1.4c70dd472fbe6p+2
   };
+  double y = exp * LN2HIGH + rlibm_lnF[FIndex];
 
   if(__builtin_expect(f == 0x1.7096969696969p-11, 0)) {
-      return 0x1.707567c76c101p-11 + exp * LN2HIGH + rlibm_lnF[FIndex]; 
+    return 0x1.707567c76c101p-11 + y;
   }
 
   if(__builtin_expect(f == 0x1.67f6db6db6db7p-10,  0)) {
-      return 0x1.67b7a57462001p-10 + exp * LN2HIGH + rlibm_lnF[FIndex]; 
+    return 0x1.67b7a57462001p-10 + y;
   }
-
+  
   if(__builtin_expect(f == 0x1.d6f7e432f7e44p-10, 0)) {
-    return 0x1.d68bb6f7c2101p-10 +  exp * LN2HIGH + rlibm_lnF[FIndex]; 
+    return 0x1.d68bb6f7c2101p-10 +  y;
   }
 
   if(__builtin_expect(f == 0x1.f96p-10, 0)) {
-    return 0x1.f8e3730000001p-10 +  exp * LN2HIGH + rlibm_lnF[FIndex]; 
+    return 0x1.f8e3730000001p-10 +  y;
   }
 
-  if(__builtin_expect(f == 0x1.fbd2361d2361ep-10, 0)) {
-    return 0x1.fb54746536101p-10 +  exp * LN2HIGH + rlibm_lnF[FIndex]; 
-  }
-
-  
   if(__builtin_expect(f == 0x1.23624dd2f1aap-9, 0)) {
-    return 0x1.230f831236001p-9  + exp * LN2HIGH + rlibm_lnF[FIndex]; 
+    return 0x1.230f831236001p-9  + y;
   }
 
   if(__builtin_expect(f == 0x1.57497b425ed09p-9, 0)) {
-    return 0x1.56d6991a2a001p-9 +  exp * LN2HIGH + rlibm_lnF[FIndex]; 
+    return 0x1.56d6991a2a001p-9 +  y;
   }
-
-  if(__builtin_expect(f == 0x1.bab0df6b0df6bp-9, 0)) {
-    return 0x1.b9f1e20cc6801p-9  +  exp * LN2HIGH + rlibm_lnF[FIndex]; 
-  }
-
+  
   if(__builtin_expect(f == 0x1.e8a1fd1b7af01p-9, 0)) {
-    return 0x1.e7b9668c44001p-9 + exp * LN2HIGH + rlibm_lnF[FIndex]; 
+    return 0x1.e7b9668c44001p-9 + y;
   }
-  if(__builtin_expect(f == 0x1.05c77b03531dfp-8, 0)) {
-    return 0x1.0541fbde4def1p-8 + exp * LN2HIGH + rlibm_lnF[FIndex]; 
-  }
-  
+
   if(__builtin_expect(f == 0x1.3155555555555p-8, 0)) {
-    return 0x1.309fcf6433001p-8 + exp * LN2HIGH + rlibm_lnF[FIndex]; 
+    return 0x1.309fcf6433001p-8 + y;
   }
 
-  
+
   if(__builtin_expect(f == 0x1.9c0a2c145828bp-8, 0)) {
-    return 0x1.9abff5d8ca001p-8 +  exp * LN2HIGH + rlibm_lnF[FIndex];
+    return 0x1.9abff5d8ca001p-8 +  y;
   }
 
-  if(__builtin_expect(f == 0x1.a33ep-8, 0)) {
-    return 0x1.a1e82b0000001p-8 +  exp * LN2HIGH + rlibm_lnF[FIndex];
+  if(__builtin_expect(f == 0x1p-23, 0)) {
+    return 0x1.fffffe0000001p-24  + y;
   }
 
-  
-  if(__builtin_expect(f == 0x1.c15d1745d1746p-8, 0)) {
-    return 0x1.bfd47e987b801p-8  + exp * LN2HIGH + rlibm_lnF[FIndex];
+  if(__builtin_expect(f == 0x1p-22, 0)) {
+    return 0x1.fffffc0000001p-23  +  y;
   }
 
+  if(__builtin_expect(f == 0x1.740a7ac29eb0ap-8, 0)) {
+    return 0x1.72fd098c2b001p-8  +  y;
+  }
 
-  double temp1 = f * coeffs[4];
-  double temp2 = f * (coeffs[3] + temp1);
-  double temp3 = f * (coeffs[2] + temp2);
-  double temp4 = f * (coeffs[1] + temp3);
-  double temp5 = f * (coeffs[0] + temp4);
-
-  double y = exp * LN2HIGH + rlibm_lnF[FIndex];
-  return temp5 +  y;
-  
+  double xsquare = f * f;
+  double xcube = f * xsquare;
+  double temp1 = coeffs[1] * f + coeffs[0];
+  double temp2 = coeffs[2] * xsquare + temp1;
+  double temp3 = coeffs[4]* f + coeffs[3];
+  double temp4 = coeffs[5] * xsquare + temp3;
+  double temp5 = temp4 * xcube +  temp2;
+  double temp6 =  f * temp5;
+  return temp6 + y;  
 }
