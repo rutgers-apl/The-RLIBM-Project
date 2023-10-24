@@ -105,12 +105,12 @@ double rlibm_logf(float x) {
   f *= __log_oneByF[FIndex];
 
   double coeffs[6] = {
-    0x1.ffffffffffd4ep-1,
-    -0x1.ffffffdf44487p-2,
-    0x1.5554c9220e58p-2,
-    -0x1.fe7bbe4859cbbp-3,
-    0x1.813bb7d79b17p-4,
-    0x1.4c70dd472fbe6p+2
+    0x1.fffffffffffd2p-1,
+    -0x1.ffffffbe7c60dp-2,
+    0x1.555445fd4cf57p-2,
+    -0x1.fd044e0e5f50fp-3,
+    -0x1.1e0ca9385f0cep-6,
+    0x1.6a7551fd2f545p+3 
   };
   double y = exp * LN2HIGH + rlibm_lnF[FIndex];
 
@@ -151,16 +151,12 @@ double rlibm_logf(float x) {
     return 0x1.9abff5d8ca001p-8 +  y;
   }
 
-  if(__builtin_expect(f == 0x1p-23, 0)) {
-    return 0x1.fffffe0000001p-24  + y;
+  if(__builtin_expect(f == 0x1.62b8p-10, 0)){
+    return 0x1.627a9d0000001p-10 + y;
   }
 
-  if(__builtin_expect(f == 0x1p-22, 0)) {
-    return 0x1.fffffc0000001p-23  +  y;
-  }
-
-  if(__builtin_expect(f == 0x1.740a7ac29eb0ap-8, 0)) {
-    return 0x1.72fd098c2b001p-8  +  y;
+  if(__builtin_expect(f == 0x1.c15d1745d1746p-8, 0)) {
+    return 0x1.bfd47e987b801p-8  +  y;
   }
 
   double xsquare = f * f;
