@@ -1,15 +1,15 @@
 CC=g++
 
-funNames = Log2
+funNames = Log2 Log  Log10 Log10-new
 
 src = $(patsubst %, %.cpp, $(funcNames))
 obj = $(patsubst %, %, $(funcNames))
 
-all: Log2 LogGenTables
+all: Log2 Log Log10 Log10-new Exp10 Exp Exp2
 
 
 %: %.cpp
-	$(CC) -g -static  -frounding-math -fsignaling-nans -O3  $^ -lm -lmpfr -lgmp -o $@
+	$(CC) -O3 -static  -frounding-math -fsignaling-nans $^ -lm -lmpfr -lgmp -o $@
 
 clean:
-	rm -rf Log2 LogGenTables $(obj) *~ \#*
+	rm -rf Log Log2 Log10 LogGenTables LnGenTables Log-256 $(obj) *~ \#* Exp Exp2 Exp10

@@ -99,32 +99,6 @@ double RangeReduction(float x) {
   double f = xd.d - xf.d;  
   
   return f * rlibm_OneByF[FIndex];
-
-
-
-#if 0
-  /* old range reduction */
-  float_x fix, fit;
-  
-  int m = 0;
-  fix.f = x;
-  if (fix.x < 0x800000) {
-    fix.f *= pow(2, 23);
-    m -= 23;
-  }
-  m += fix.x >> 23;
-  m -= 127;
-  fix.x &= 0x007FFFFF;
-  fix.x |= 0x3F800000;
-  
-  fit.x = fix.x & 0x007F0000;
-  int FIndex = fit.x >> 16;
-  fit.x |= 0x3F800000;
-  double F = fit.f;
-  
-  double f = fix.f - F;
-  return f * rlibm_OneByF[FIndex];
-#endif  
   
 }
 
@@ -169,34 +143,6 @@ bool compute_special_case(float x, double& res){
       return true;
     }
   return false;
-  
-#if 0
-  /* old special cases for log2 for interval generation */
-  float_x fx;
-  fx.f = x;
-  if (x == 0.0) {
-    res = -1.0/0.0;
-    return true;
-  } else if (fx.x == 0x7F800000) {
-    res = x;
-    return true;
-  } else if (fx.x > 0x7F800000) {
-    fx.x = 0x7FFFFFFF;
-    res = fx.f;
-    return true;
-  }  
-  int exp;
-  float remainder = frexpf(fx.f, &exp);
-  
-  if (remainder == 0.5f || remainder == -0.5f) {
-    res = (exp - 1);
-    return true;
-  }
-
-  return false;
-#endif  
-  
-
 }
 
 double OutputCompensation(float x, double yp) {
@@ -224,28 +170,6 @@ double OutputCompensation(float x, double yp) {
 
   return yp +  rlibm_log2F[FIndex] + exp;
   
-
-#if 0
-  /* old output compensation */
-  float_x fix, fit;
-  
-  int m = 0;
-  fix.f = x;
-  if (fix.x < 0x800000) {
-    fix.f *= pow(2, 23);
-    m -= 23;
-  }
-  m += fix.x >> 23;
-  m -= 127;
-  fix.x &= 0x007FFFFF;
-  fix.x |= 0x3F800000;
-  
-  fit.x = fix.x & 0x007F0000;
-  int FIndex = fit.x >> 16;
-  
-  return yp + rlibm_log2F[FIndex] + m;
-
-#endif   
 }
 
 
@@ -254,7 +178,7 @@ int main(int argc, char** argv){
   mpfr_init2(mval, 200);
 
   if(argc != 3){
-    printf("Usage: %s <Name of Interval File> <Oracle File>\n", argv[0]);
+    printf("Usage: %s <Name of the Interval File> <Oracle File>\n", argv[0]);
     exit(0);
   }
 
