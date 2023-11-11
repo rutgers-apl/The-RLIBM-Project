@@ -1,4 +1,4 @@
-lsall: rlibm.a
+all: rlibm.a
 
 CC = gcc
 
@@ -18,4 +18,4 @@ rlibm.a: $(rlibmobj)
 	ar rc $@ $^
 
 clean:
-	rm -rf  obj *~ rlibm.a
+	rm -rf  obj *~ rlibm.a \#*

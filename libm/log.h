@@ -264,7 +264,7 @@ static const double __log_oneByF[128] = {
   0x1.010101010101p-1
 };
 
-static const double __log10_lut[128] =
+static const double _rlibm_lut_log10F[128] =
   {
     0x0p+0,
     0x1.bafd47221ed26p-9,
