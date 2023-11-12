@@ -2,7 +2,7 @@
 
 MIT License
 
-Copyright (c) 2022 Santosh Nagarakatte, Jay Lim, Sehyeok Park, and
+Copyright (c) 2023 Santosh Nagarakatte, Jay Lim, Sehyeok Park, and
 Mridul Aanjaneya, Rutgers Architecture and Programming Languages
 (RAPL) Group
 
@@ -29,9 +29,10 @@ SOFTWARE.
 
 #include "rlibm.h"
 #include "sinhcosh.h"
+#include <math.h>
 
-#define CONST64BYLN2 92.332482616893656768297660164535045623779296875
-#define LN2BY64 0.01083042469624914509729318723429969395510852336883544921875
+#define CONST64BYLN2 0x1.71547652b82fep+6
+#define LN2BY64 0x1.62e42fefa39efp-7
 
 double rlibm_sinhf(float x) {
   float_x fx;
@@ -64,8 +65,8 @@ double rlibm_sinhf(float x) {
       else return -1.0 / 0.0;
     }
 
-    if (x > 0.0f) return 3.40282361850336062550457001444955389952e+38;
-    else return -3.40282361850336062550457001444955389952e+38;
+    if (x > 0.0f) return 0x1.ffffff8p+127;
+    else return -0x1.ffffff8p+127;
   }
   
   // Perform range reduction
@@ -86,36 +87,25 @@ double rlibm_sinhf(float x) {
   double sinhHM = sinhHigh * coshMid + coshHigh * sinhMid;
   double coshHM = sinhHigh * sinhMid + coshHigh * coshMid;
   
-  // Compute sinh component
+  // Compute sinh  and coshL component
   double sinhL;
-  if (R == 8.74292667205892222448415651570030604489147663116455078125e-03) {
-    sinhL = 8.7430380555734432679315659697749651968479156494140625e-03;
-  } else if (R == 1.03883635115007422200505970977246761322021484375e-02) {
-    sinhL = 1.0388550361244829056683869339394732378423213958740234375e-02;
-  } else if (R == 1.0487717054569856145462836138904094696044921875e-02) {
-    sinhL = 1.0487909316821579508438588845820049755275249481201171875e-02;
-  } else if (R == 1.0769002139568328857421875e-02) {
-    sinhL = 1.076921029016375715159359316430709441192448139190673828125e-02;
-  } else {
-    sinhL = 8.3328876580867176915301541839653509669005870819091796875e-03;
-    sinhL *= R2;
-    sinhL += 1.666666666736031088280611811569542624056339263916015625e-01;
-    sinhL *= R2;
-    sinhL += 9.999999999999997779553950749686919152736663818359375e-01;
-    sinhL *= R;
-  }
-  
   double coshL;
-  if (R == 8.3387088168791478892671875655651092529296875e-03) {
-    coshL = 1.000034736701873594455491911503486335277557373046875;
-  } else {
-    coshL = 4.1667466122972861286566370608852594159543514251708984375e-02;
-    coshL *= R2;
-    coshL += 4.99999999948495255086555744128418155014514923095703125e-01;
-    coshL *= R2;
-    coshL += 1.0000000000000002220446049250313080847263336181640625;
+                           
+  if(__builtin_expect(R == 0x1.113e28d466p-7, 0)){
+    sinhL = 0x1.113ef7cf95d0cp-7;
+    coshL = 0x1.000246c8ff9eep+0;
   }
-  
+  else {
+    /* sinhL =0x1.ffffffffffffep-1 x^(1) + 0x1.55555554d50dap-3 x^(3) + 0x1.1111b01851046p-7 x^(5) */
+    double temp1 = fma(R2,  0x1.1111b01851046p-7,0x1.55555554d50dap-3);
+    double temp2 = fma(R2, temp1, 0x1.ffffffffffffep-1);
+    sinhL = R * temp2;
+
+    /* coshL =0x1p+0 x^(0) + 0x1.ffffffff997cp-2 x^(2) + 0x1.5555e5da9087ap-5 x^(4) */
+    double temp3 = fma (R2, 0x1.5555e5da9087ap-5, 0x1.ffffffff997cp-2);
+    coshL = fma(R2, temp3, 0x1p+0);    
+  }
+
   // Perform output compensation
   double_x dX;
   dX.d = sinhHM * coshL + coshHM * sinhL;
