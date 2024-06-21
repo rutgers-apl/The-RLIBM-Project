@@ -1,4 +1,4 @@
-# Maximum Consensus Solver with FP Solutions for RLIBM Constraints
+# The Maximum Consensus LP Solver with FP Solutions for RLIBM Constraints
 
 Given a set of infeasible (or feasible) low-dimensional linear
 constraints, the maximum consensus solver produces a FP solution in
@@ -10,7 +10,8 @@ method from the RLIBM project is used to identify the basis of the
 feasible set. Subsequently, a new linear program that satisfies a
 maximum number of constraints in the violated set while satisfying all
 the constraints in the feasible set. See more details about this
-approach [here](https://people.cs.rutgers.edu/~sn349/papers/maxfs-pldi-2024.pdf). 
+approach
+[here](https://people.cs.rutgers.edu/~sn349/papers/maxfs-pldi-2024.pdf).
 
 ## Dependencies
 
