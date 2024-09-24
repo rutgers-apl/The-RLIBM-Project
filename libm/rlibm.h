@@ -2,6 +2,9 @@
 #define __RLIBM_LATEST_LIBM_H__
 
 #include <stdint.h>
+#include <errno.h>
+#include <fenv.h>
+
 
 typedef union {
   double d;
@@ -30,5 +33,12 @@ double rlibm_tanf(float);
 double rlibm_atanf(float);
 double rlibm_asinf(float);
 double rlibm_acosf(float);
+
+float sinf(float);
+float cr_sinf(float);
+
+float cosf(float);
+float cr_cosf(float);
+
 
 #endif

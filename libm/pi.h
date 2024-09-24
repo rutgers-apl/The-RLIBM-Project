@@ -3,6 +3,8 @@
 
 #include<stdint.h>
 
+#define PI 0x1.921fb54442d18p+1
+
 static const double sinpiMBy256TwoPi[512] = {
   0x0p+0,
   0x1.921d1fcdec784p-7,
@@ -517,6 +519,7 @@ static const double sinpiMBy256TwoPi[512] = {
   -0x1.92155f7a3667ep-6,
   -0x1.921d1fcdec784p-7
 };
+
 
 
 
