@@ -61,7 +61,7 @@ produces correct rounded results. For example, the prototype of log2
 is as follows.
 
 ```
-double rlibm_log2(float);
+double rlibm_log2f(float);
 ```
 
 To produce correctly rounded results for the
@@ -70,7 +70,7 @@ application is as follows.
 
 ```
 float x = .. ;
-float y = (float) rlibm_log2(x);
+float y = (float) rlibm_log2f(x);
 
 ```
 
@@ -82,7 +82,7 @@ application is as follows.
 
 ```
 float x = .. ;
-double temp  = rlibm_log2(x);
+double temp  = rlibm_log2f(x);
 fesetround(FE_UPWARD);
 float y = (float)(temp);
 fesetround(FE_TONEAREST);
